@@ -1,2 +1,0 @@
-test.Player
-test.Game
