@@ -2,6 +2,7 @@ package dictionary;
 import java.util.TreeSet;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.LinkedList;
 
 class Word implements Comparable{
     String word_target;
@@ -35,13 +36,17 @@ class Word implements Comparable{
 class DictionaryManagement{
     private ArrayList<Word> DictData = new ArrayList<Word>();
     
-    int findPosion(String w){
+    //finding position of a word if dictionary has it or the position of the word front of it
+    int findPosition(String w){
         int n = this.DictData.size() - 1;
         int i = 0;
-        
+        try{
         if(w.compareTo(this.DictData.get(0).word_target) <= 0)
             return 0;
-            
+        }catch(Exception e){
+            return 0;
+        }
+        
         while(i < n){
             Word w1 = this.DictData.get((i + n)/2);
             int compare = w.compareTo(w1.word_target);
@@ -60,26 +65,52 @@ class DictionaryManagement{
         return i;
     }
     
+    ///useless
     void addWord(String word, String info){
+        this.addWord(new Word(word,info));
+    }
+    
+    //add word into dictionary if it doesn't have
+    boolean addWord(Word word){
+        int i = this.findPosition(word.word_target);
+
+        if(this.DictData.size() == 0 || this.DictData.get(i).compareTo(word) != 0){
+            this.DictData.add(i,word);
+            return true;
+        } else
+            return false;
+    }
+    
+    //remove word from dictionary if it has
+    boolean removeWord(Word word){
+        if(this.DictData.remove(word))
+            return true;
+                
+        if(this.DictData.size() == 0)
+            return false;
+            
+        int i = this.findPosition(word.word_target);
         
+        if(this.DictData.get(i).compareTo(word) == 0){
+            this.DictData.remove(i);
+            return true;
+        } else
+            return false;
     }
     
-    void addWord(Word word){
-        this.DictData.add(word);
+    //make change in word's info
+    void changeWordInfo(Word word, String info){
+        word.setInfo(info);
     }
     
-    void deleteWord(){
-        
-    }
-    
-    void changeWordInfo(){
-        
-    }
-    
+    // print out word and it's info
     void print(){
         for(Word w : this.DictData)
             w.print();
     }
+    
+    //
+    
 }
     
         
@@ -88,12 +119,26 @@ public class Dictionary {
     
     public static void main(String[] args) {
         DictionaryManagement d = new DictionaryManagement();
-        d.addWord(new Word("a",""));
-        d.addWord(new Word("b",""));
-        d.addWord(new Word("c",""));
+        if(d.addWord(new Word("a","")))
+            System.out.println("can a 1");
+        if(d.addWord(new Word("ab","")))
+            System.out.println("can ab 2");
+        if(d.addWord(new Word("a","")))
+            System.out.println("can a 3");
+        if(d.addWord(new Word("Aa","")))
+            System.out.println("can Aa 3");
+        
+        if(d.removeWord(new Word("Aa","")))
+            System.out.println("xoa Aa 3");
         
         d.print();
-        System.out.println(("A").compareTo("a"));
+        Word a = new Word("a","");
+        Word b = new Word("aa","");
+        Word c = new Word("ab","");
+        
+        if(a.compareTo(a)==0)
+            System.out.println(c.compareTo(b));
+        
     }
     
 }
