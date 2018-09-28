@@ -3,6 +3,7 @@ import java.util.TreeSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.LinkedList;
+import java.util.Scanner;
 
 class Word implements Comparable{
     String word_target;
@@ -135,9 +136,17 @@ public class Dictionary {
         Word a = new Word("a","");
         Word b = new Word("aa","");
         Word c = new Word("ab","");
-        
-        if(a.compareTo(a)==0)
-            System.out.println(c.compareTo(b));
+        Scanner scan = new Scanner(System.in);
+        try{
+            
+            System.out.println(Translator.translate("en", "vi", scan.nextLine()));
+            
+        } catch(Exception e) {
+            System.out.println("can't translate");
+            e.printStackTrace();
+        } finally {
+            Translator.disconnect();
+        }
         
     }
     
