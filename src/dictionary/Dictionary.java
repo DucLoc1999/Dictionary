@@ -1,38 +1,12 @@
 package dictionary;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.util.TreeSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Scanner;
 
-class Word implements Comparable{
-    String word_target;
-    String word_explain = new String();
-    
-    Word(String word,String info){
-        this.word_target = word;
-        this.word_explain = info;
-    }
-    
-    void setInfo(String s){
-        this.word_explain = s;
-    }
-    
-    void print(){
-        System.out.println(this.word_target+ "\n" + this.word_explain);
-    }
-    
-    public boolean equals(Word w){
-        return this.word_target.equals(w.word_target);
-    }
-    
-    @Override
-    public int compareTo(Object t) {
-        Word w = (Word) t;
-        return (this.word_target).compareTo(w.word_target);
-       // throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-}
 
 class DictionaryManagement{
     private ArrayList<Word> DictData = new ArrayList<Word>();
@@ -67,8 +41,8 @@ class DictionaryManagement{
     }
     
     ///useless
-    void addWord(String word, String info){
-        this.addWord(new Word(word,info));
+    void addWord(String word, String pronounce, String info){
+        this.addWord(new Word(word, pronounce, info));
     }
     
     //add word into dictionary if it doesn't have
@@ -109,9 +83,48 @@ class DictionaryManagement{
         for(Word w : this.DictData)
             w.print();
     }
-    
+    //useless
+    void print(int tt){
+        Word w = this.DictData.get(tt);
+        if(w != null)
+            w.print();
+    }
     //
-    
+    public void readFile(String filePath){
+
+        String line;
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            //sl chux
+            int count = 0;
+            while ((line = reader.readLine()) != null && count < 50)
+            {
+                count ++;
+                line = (line.substring(1, line.length()- 1));
+                String[] w = line.split("/");
+                int i = 0;
+                String word = "";
+                String pronounce ="";
+                for(String s : w){
+                    if(i == 0)
+                        word += s.substring(0, s.length() - 1);
+                    else
+                        pronounce += "/" + s;
+                    i++;
+                }
+                pronounce += "/";
+                
+                String explain = "" + reader.readLine();
+                while(!"".equals(line = reader.readLine())){
+                    explain += "\n" + line;
+                }
+                this.DictData.add(new Word(word, pronounce, explain));
+                
+            }
+        } catch (Exception e) {
+            System.out.println("can't read file: " + filePath);
+        }
+    }
+
 }
     
         
@@ -119,34 +132,10 @@ public class Dictionary {
 
     
     public static void main(String[] args) {
-        DictionaryManagement d = new DictionaryManagement();
-        if(d.addWord(new Word("a","")))
-            System.out.println("can a 1");
-        if(d.addWord(new Word("ab","")))
-            System.out.println("can ab 2");
-        if(d.addWord(new Word("a","")))
-            System.out.println("can a 3");
-        if(d.addWord(new Word("Aa","")))
-            System.out.println("can Aa 3");
+        DictionaryManagement dict = new DictionaryManagement();
+        dict.readFile("./AnhViet.txt");
+        dict.print(dict.findPosition("a font"));
         
-        if(d.removeWord(new Word("Aa","")))
-            System.out.println("xoa Aa 3");
-        
-        d.print();
-        Word a = new Word("a","");
-        Word b = new Word("aa","");
-        Word c = new Word("ab","");
-        Scanner scan = new Scanner(System.in);
-        try{
-            
-            System.out.println(Translator.translate("en", "vi", scan.nextLine()));
-            
-        } catch(Exception e) {
-            System.out.println("can't translate");
-            e.printStackTrace();
-        } finally {
-            Translator.disconnect();
-        }
         
     }
     
