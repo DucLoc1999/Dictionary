@@ -1,4 +1,5 @@
 package dictionary;
+import static dictionary.ApiKeys.YANDEX_API_KEY;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.TreeSet;
@@ -6,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 class DictionaryManagement{
@@ -94,48 +97,70 @@ class DictionaryManagement{
 
         String line;
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            //sl chux
-            int count = 0;
-            while ((line = reader.readLine()) != null && count < 50)
+            while ((line = reader.readLine()) != null)//lấy đến hết
             {
-                count ++;
-                line = (line.substring(1, line.length()- 1));
-                String[] w = line.split("/");
+                line = (line.substring(1, line.length()- 1)); // bỏ pt @ đầu chữ
+                String[] w = line.split("/");// tách phần phát âm ra
                 int i = 0;
                 String word = "";
                 String pronounce ="";
                 for(String s : w){
                     if(i == 0)
-                        word += s.substring(0, s.length() - 1);
+                        word += s.substring(0, s.length() - 1);//xếp phần chữ lại
                     else
-                        pronounce += "/" + s;
+                        pronounce += "/" + s;//xếp phần phát âm lại
                     i++;
                 }
                 pronounce += "/";
                 
                 String explain = "" + reader.readLine();
-                while(!"".equals(line = reader.readLine())){
+                while(!"".equals(line = reader.readLine())){// "" là dòng giữa các từ khác nhau lấy hết phần info của từ trước dòng này
                     explain += "\n" + line;
                 }
                 this.DictData.add(new Word(word, pronounce, explain));
                 
             }
         } catch (Exception e) {
+            System.out.println(this.DictData.size());
             System.out.println("can't read file: " + filePath);
         }
     }
 
+    public ArrayList<Word> getDictData() {
+        return DictData;
+    }
+    
 }
     
         
 public class Dictionary {
 
     
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         DictionaryManagement dict = new DictionaryManagement();
         dict.readFile("./AnhViet.txt");
-        dict.print(dict.findPosition("a font"));
-        
+        Scanner scan = new Scanner(System.in);
+        String input = " ";
+        // "#ok close" lệnh tạm thời để dừng chương trình
+        while(!"#ok close".equals(input = scan.nextLine())){
+            
+            int pos = dict.findPosition(input);
+            
+            if(pos < dict.getDictData().size() && dict.getDictData().get(pos).compareTo(input) == 0)
+                dict.print(pos);
+            else{
+                try {
+                    Translate.setKey(YANDEX_API_KEY);
+                    //if(Detect.execute(input).compareTo(Language.ENGLISH) == 0)
+                    System.out.println(Translate.execute(input, Language.ENGLISH, Language.VIETNAM));
+                    //else
+                    //    System.out.println("ERROR: input is not English language");
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        }
         
     }
     

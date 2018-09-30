@@ -33,4 +33,10 @@ public class Word implements Comparable{
         return (this.word_target).compareTo(w.word_target);
        // throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+    public int compareTo(String w) {
+        return (this.word_target).compareTo(w);
+       // throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }
