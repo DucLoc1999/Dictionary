@@ -2,39 +2,40 @@ package dictionary;
 import static dictionary.ApiKeys.YANDEX_API_KEY;
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.TreeSet;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.LinkedList;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 
 class DictionaryManagement{
-    private ArrayList<Word> DictData = new ArrayList<Word>();
+    private ArrayList<Word> DictionaryData = new ArrayList<>();
+    
+    public ArrayList<Word> getData() {
+        return DictionaryData;
+    }
     
     //finding position of a word if dictionary has it or the position of the word front of it
     int findPosition(String w){
-        int n = this.DictData.size() - 1;
+        int n = this.getData().size() - 1;
         int i = 0;
         try{
-        if(w.compareTo(this.DictData.get(0).word_target) <= 0)
+        if(w.compareTo(this.getData().get(0).getWord_target()) <= 0)
             return 0;
         }catch(Exception e){
             return 0;
         }
         
         while(i < n){
-            Word w1 = this.DictData.get((i + n)/2);
-            int compare = w.compareTo(w1.word_target);
+            Word w1 = this.getData().get((i + n)/2);
+            int compare = w.compareTo(w1.getWord_target());
             
-            if(w.compareTo(this.DictData.get(n).word_target) >= 0)
-                return n;
+            if(w.compareTo(this.getData().get(n).getWord_target()) > 0)
+                return n+1;
+            
             if(compare == 0){
                 return (i+n)/2;
+                
             }else if(compare > 0){
-                i = (i+n)/2;
+                i = (i+n)/2 + 1;
                 n --;
             } else {
                 n = (i+n)/2;
@@ -45,90 +46,87 @@ class DictionaryManagement{
     
     ///useless
     void addWord(String word, String pronounce, String info){
-        this.addWord(new Word(word, pronounce, info));
+        this.DictionaryData.add(new Word(word, pronounce, info));
     }
     
     //add word into dictionary if it doesn't have
     boolean addWord(Word word){
-        int i = this.findPosition(word.word_target);
 
-        if(this.DictData.size() == 0 || this.DictData.get(i).compareTo(word) != 0){
-            this.DictData.add(i,word);
+        if(this.getData().isEmpty()){
+            this.DictionaryData.add(word);
             return true;
-        } else
-            return false;
+        }
+
+        int i = this.findPosition(word.getWord_target());            
+        if(this.DictionaryData.get(i).compareTo(word) != 0){
+            this.DictionaryData.add(i,word);
+            return true;
+        }
+        
+        return false;
     }
     
     //remove word from dictionary if it has
     boolean removeWord(Word word){
-        if(this.DictData.remove(word))
+        if(this.DictionaryData.remove(word))
             return true;
                 
-        if(this.DictData.size() == 0)
+        if(this.DictionaryData.isEmpty())
             return false;
             
-        int i = this.findPosition(word.word_target);
+        int i = this.findPosition(word.getWord_target());
         
-        if(this.DictData.get(i).compareTo(word) == 0){
-            this.DictData.remove(i);
+        if(this.DictionaryData.get(i).compareTo(word) == 0){
+            this.DictionaryData.remove(i);
             return true;
         } else
             return false;
     }
     
-    //make change in word's info
-    void changeWordInfo(Word word, String info){
-        word.setInfo(info);
-    }
-    
     // print out word and it's info
     void print(){
-        for(Word w : this.DictData)
+        for(Word w : this.DictionaryData)
             w.print();
     }
+    
     //useless
     void print(int tt){
-        Word w = this.DictData.get(tt);
+        Word w = this.DictionaryData.get(tt);
         if(w != null)
             w.print();
     }
     //
     public void readFile(String filePath){
-
         String line;
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            while ((line = reader.readLine()) != null)//lấy đến hết
-            {
-                line = (line.substring(1, line.length()- 1)); // bỏ pt @ đầu chữ
+        try  {
+            BufferedReader reader = new BufferedReader(new FileReader(filePath));
+            reader.readLine();
+            while ((line = reader.readLine()) != null){//lấy đến hết
                 String[] w = line.split("/");// tách phần phát âm ra
-                int i = 0;
                 String word = "";
                 String pronounce ="";
-                for(String s : w){
-                    if(i == 0)
-                        word += s.substring(0, s.length() - 1);//xếp phần chữ lại
-                    else
-                        pronounce += "/" + s;//xếp phần phát âm lại
-                    i++;
+                word += w[0].substring(0, w[0].length() - 1);//xếp phần chữ lại
+                for(int i = 1; i < w.length; i++){
+                        pronounce += "/" + w[i];//xếp phần phát âm lại
                 }
                 pronounce += "/";
                 
                 String explain = "" + reader.readLine();
-                while(!"".equals(line = reader.readLine())){// "" là dòng giữa các từ khác nhau lấy hết phần info của từ trước dòng này
+                // "" là dòng giữa các từ khác nhau lấy hết phần info của từ trước dòng này
+                while((line = reader.readLine())!= null && !line.equals("")){
                     explain += "\n" + line;
                 }
-                this.DictData.add(new Word(word, pronounce, explain));
+                
+                this.DictionaryData.add(new Word(word, pronounce, explain));
+                //this.DictionaryData.get(this.DictionaryData.size()-1).print();
                 
             }
         } catch (Exception e) {
-            System.out.println(this.DictData.size());
+            System.out.println(this.DictionaryData.size());
             System.out.println("can't read file: " + filePath);
         }
     }
 
-    public ArrayList<Word> getDictData() {
-        return DictData;
-    }
     
 }
     
@@ -138,30 +136,52 @@ public class Dictionary {
     
     public static void main(String[] args) throws Exception {
         DictionaryManagement dict = new DictionaryManagement();
-        dict.readFile("./AnhViet.txt");
+        dict.readFile("./AnhViet1.txt");
+        
         Scanner scan = new Scanner(System.in);
-        String input = " ";
-        // "#ok close" lệnh tạm thời để dừng chương trình
-        while(!"#ok close".equals(input = scan.nextLine())){
+        String input = "";
+        
+        // "#c" lệnh tạm thời để dừng chương trình
+        /*while(!"#c".equals(input = scan.nextLine())){
             
             int pos = dict.findPosition(input);
-            
-            if(pos < dict.getDictData().size() && dict.getDictData().get(pos).compareTo(input) == 0)
+            System.out.print(pos +":  ");
+            if(dict.getData().get(pos).compareTo(input) == 0)
                 dict.print(pos);
             else{
-                try {
-                    Translate.setKey(YANDEX_API_KEY);
+                System.out.println(dict.getData().get(pos).getWord_target());
+           //     try {
+             //       Translate.setKey(YANDEX_API_KEY);
                     //if(Detect.execute(input).compareTo(Language.ENGLISH) == 0)
-                    System.out.println(Translate.execute(input, Language.ENGLISH, Language.VIETNAM));
+               //     System.out.println(Translate.execute(input, Language.ENGLISH, Language.VIETNAM));
                     //else
                     //    System.out.println("ERROR: input is not English language");
-                } catch (Exception e) {
+                //} catch (Exception e) {
                     // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
+                  //  e.printStackTrace();
+                //}
+                
             }
-        }
+        }*/
         
+        
+        
+        System.out.println(dict.getData().size());
+        int a;
+        while(123 != (a = scan.nextInt())){
+            dict.getData().get(a).print();
+            }
+          
+        
+        
+        /**
+         * text to speech
+         */
+        /*
+        while(!("stop").equals(input)){
+            input = scan.nextLine();
+            textSpeech.speak(input);
+        }*/
     }
     
 }

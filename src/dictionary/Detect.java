@@ -38,7 +38,9 @@ public final class Detect extends YandexTranslatorAPI {
 	  */
 	  public static Language execute(final String text) throws Exception {
 	    validateServiceState(text); 
-	    final String params = PARAM_API_KEY+URLEncoder.encode(apiKey,ENCODING)+PARAM_TEXT+URLEncoder.encode(text,ENCODING);
+	    final String params = PARAM_API_KEY 
+            + URLEncoder.encode(apiKey,ENCODING) 
+            + PARAM_TEXT+URLEncoder.encode(text,ENCODING);
 	    final URL url = new URL(SERVICE_URL + params);
       return Language.fromString(retrievePropString(url, DETECTION_LABEL));
 	  }

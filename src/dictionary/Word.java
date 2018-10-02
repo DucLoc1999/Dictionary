@@ -5,18 +5,26 @@ package dictionary;
  * @author SONY
  */
 public class Word implements Comparable{
-    String word_target;
-    String pronounce; 
-    String word_explain = new String();
+    private String word_target;
+    private String pronounce; 
+    private String word_explain;
+
+    public String getWord_target() {return word_target;}
+
+    public void setWord_target(String word_target) {this.word_target = word_target;}
+
+    public String getPronounce() {return pronounce;}
+
+    public void setPronounce(String pronounce) {this.pronounce = pronounce;}
+
+    public String getWord_explain() {return word_explain;}
+
+    public void setWord_explain(String word_explain) {this.word_explain = word_explain;}
     
     Word(String word, String pronounce, String info){
         this.word_target = word;
         this.pronounce = pronounce;
         this.word_explain = info;
-    }
-    
-    void setInfo(String s){
-        this.word_explain = s;
     }
     
     void print(){
