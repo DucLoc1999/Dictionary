@@ -18,34 +18,40 @@ public class DataBase{
          //this.readFile(FILE_PATH);
 
     }
+    
     //finding position of a word if dictionary has it or the position of the word front of it
-    public int findPosition(String w){
-        int n = this.DictData.size() - 1;
+    int findPosition(String w){
+        int n = this.getData().size() - 1;
         int i = 0;
-        try{
-            if(w.compareTo(this.DictData.get(0).word_target) <= 0)
-                return 0;
-        }catch(Exception e){
+        
+        if(w.compareTo(this.getData().get(0).getWord_target()) <= 0)
             return 0;
-        }
-
+        
         while(i < n){
-            Word w1 = this.DictData.get((i + n)/2);
-            int compare = w.compareTo(w1.word_target);
-
-            if(w.compareTo(this.DictData.get(n).word_target) >= 0)
+            if(w.compareTo(this.getData().get(n).getWord_target()) == 0)
                 return n;
+            
+            if(w.compareTo(this.getData().get(n).getWord_target()) > 0)
+                return n+1;//find "e" in "a", "b", "d" will return 4 pos after "d"
+            
+            Word w1 = this.getData().get((i + n)/2);
+            int compare = w.compareTo(w1.getWord_target());
+
             if(compare == 0){
                 return (i+n)/2;
+                
             }else if(compare > 0){
-                i = (i+n)/2;
+                i = (i+n)/2 + 1;
                 n --;
             } else {
                 n = (i+n)/2;
             }
         }
+        if(w.compareTo(this.getData().get(i).getWord_target()) > 0)
+            return i+1;//find "c" in "a", "b", "d" will return 2 pos of "d"
         return i;
     }
+    
 
     ///useless
     void addWord(String word, String info){
